@@ -1,4 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:melody/function/audio_functions.dart';
+import 'package:melody/function/music_player_streams.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class PlayPauseButton extends StatefulWidget {
@@ -11,7 +17,6 @@ class PlayPauseButton extends StatefulWidget {
 class PlayPauseButtonState extends State<PlayPauseButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  bool isPlaying = false;
 
   @override
   void initState() {
@@ -28,21 +33,30 @@ class PlayPauseButtonState extends State<PlayPauseButton>
     super.dispose();
   }
 
-  void _togglePlayPause() {
-    setState(
-      () {
-        if (isPlaying) {
-          _controller.reverse();
-        } else {
-          _controller.forward();
-        }
-        isPlaying = !isPlaying;
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    ProcessingState state =
+        Provider.of<MusicPlayerStreams>(context).processingState ??
+            ProcessingState.buffering;
+
+    switch (state) {
+      case ProcessingState.idle:
+        _controller.reset();
+        return playPauseButton(context);
+      case ProcessingState.loading:
+      case ProcessingState.buffering:
+        return loadingIndicator(context);
+      case ProcessingState.ready:
+        return playPauseButton(context);
+      case ProcessingState.completed:
+        _controller.reset();
+        return playPauseButton(context);
+    }
+  }
+
+  Widget playPauseButton(BuildContext context) {
+    bool isPlaying = Provider.of<MusicPlayerStreams>(context).isPlaying;
+    isPlaying ? _controller.forward() : _controller.reverse();
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
@@ -55,7 +69,32 @@ class PlayPauseButtonState extends State<PlayPauseButton>
           progress: _controller,
           color: Theme.of(context).colorScheme.onSecondary,
         ),
-        onPressed: _togglePlayPause,
+        onPressed: () {
+          if (isPlaying) {
+            AudioFunctions.player.pause();
+            // _controller.reverse();
+          } else {
+            AudioFunctions.player.play();
+            // _controller.forward();
+          }
+        },
+      ),
+    );
+  }
+
+  Widget loadingIndicator(BuildContext context) {
+    return Container(
+      width: 0.565.dp,
+      height: 0.565.dp,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Theme.of(context).colorScheme.secondary,
+      ),
+      child: IconButton(
+        icon: CircularProgressIndicator(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        onPressed: () {},
       ),
     );
   }

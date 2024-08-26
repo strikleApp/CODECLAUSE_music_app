@@ -1,8 +1,10 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:melody/constants/constants.dart';
 import 'package:melody/constants/shared_preferences_keys.dart';
 import 'package:melody/db/hive.dart';
+import 'package:melody/function/music_player_streams.dart';
 import 'package:melody/function/provider_function.dart';
 import 'package:melody/screens/main_screen.dart';
 import 'package:melody/screens/ttsScreen.dart';
@@ -62,10 +64,14 @@ class LoadingScreenState extends State<LoadingScreen> {
       await HiveDB.initHive();
       if (mounted) {
         await Provider.of<ProviderFunction>(context, listen: false)
-            .getVideosFromYoutube();
+            .getVideosFromYoutube(kInitialSearchKeyword);
       }
-    } catch (e) {
-      print(e);
+      if (mounted) {
+        await Provider.of<ProviderFunction>(context, listen: false)
+            .getAllDownloads();
+      }
+    } catch (_) {
+      print(_);
     }
   }
 

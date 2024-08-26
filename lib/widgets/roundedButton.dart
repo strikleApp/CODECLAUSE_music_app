@@ -1,5 +1,7 @@
-
 import 'package:flutter/material.dart';
+import 'package:melody/function/audio_functions.dart';
+import 'package:melody/function/music_player_streams.dart';
+import 'package:provider/provider.dart';
 
 class RoundButton extends StatelessWidget {
   final IconData icon;
@@ -37,16 +39,26 @@ class ShuffleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isShuffleOn = Provider.of<MusicPlayerStreams>(context).isShuffleOn;
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        isShuffleOn
+            ? AudioFunctions.player.setShuffleModeEnabled(false)
+            : AudioFunctions.player.setShuffleModeEnabled(true);
+      },
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: isShuffleOn
+            ? Theme.of(context).colorScheme.secondary
+            : Theme.of(context).colorScheme.onSecondary,
         elevation: 0,
       ),
-      child: const Icon(
+      child: Icon(
         Icons.shuffle,
         size: 25,
+        color: !isShuffleOn
+            ? Theme.of(context).colorScheme.secondary
+            : Theme.of(context).colorScheme.onSecondary,
       ),
     );
   }

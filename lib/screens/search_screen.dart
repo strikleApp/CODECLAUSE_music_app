@@ -4,6 +4,7 @@ import 'package:melody/widgets/custom_search_bar.dart';
 import 'package:melody/widgets/list_tile_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -17,18 +18,22 @@ class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchTextEditingController =
       TextEditingController();
 
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
-    VideoSearchList? videoSearchList =
-        Provider.of<ProviderFunction>(context).video;
+    List<Video>? videos = Provider.of<ProviderFunction>(context).video;
     return Stack(
       children: [
-        ListView.builder(
-          itemCount: videoSearchList?.length ?? 0,
-          itemBuilder: (context, index) {
-            Video video = videoSearchList![index];
-            return ListWidget(videoDetails: video);
-          },
+        Skeletonizer(
+          enabled: _isLoading,
+          child: ListView.builder(
+            itemCount: videos?.length ?? 0,
+            itemBuilder: (context, index) {
+              Video video = videos![index];
+              return ListWidget(videoDetails: video);
+            },
+          ),
         ),
         SafeArea(
           child: AnimSearchBar(
@@ -44,11 +49,24 @@ class _SearchScreenState extends State<SearchScreen> {
               Icons.search_rounded,
               color: Theme.of(context).colorScheme.primary,
             ),
-            onSuffixTap: () {},
-            onCompleteFunction: () {},
+            onSuffixTap: _searchYtVideo,
+            closeSearchOnSuffixTap: true,
+            onCompleteFunction: _searchYtVideo,
           ),
         )
       ],
     );
+  }
+
+  void _searchYtVideo() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await Provider.of<ProviderFunction>(context, listen: false)
+        .getVideosFromYoutube(_searchTextEditingController.text)
+        .whenComplete(() => setState(() {
+              _isLoading = false;
+            }));
+    _searchTextEditingController.clear();
   }
 }

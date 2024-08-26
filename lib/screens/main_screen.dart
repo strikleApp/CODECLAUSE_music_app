@@ -1,16 +1,12 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:melody/function/provider_function.dart';
+import 'package:melody/screens/download_screen.dart';
 import 'package:melody/screens/music_screen.dart';
 import 'package:melody/screens/search_screen.dart';
 import 'package:melody/screens/settings_screen.dart';
 import 'package:melody/screens/video_screen.dart';
-import 'package:melody/widgets/custom_search_bar.dart';
-import 'package:melody/widgets/list_tile_widget.dart';
-import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -34,6 +30,16 @@ class _MainScreenState extends State<MainScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: _buildCurvedNavigationBar(context),
+      floatingActionButton: _bottomBarIndex == 0
+          ? FloatingActionButton(
+              child: const Icon(Icons.download_rounded),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DownloadScreen()));
+              })
+          : null,
       body: IndexedStack(
         index: _bottomBarIndex,
         children: [
@@ -56,11 +62,13 @@ class _MainScreenState extends State<MainScreen>
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       buttonBackgroundColor: Theme.of(context).colorScheme.primary,
       onTap: (index) {
-        setState(() {
-          _bottomBarIndex = index;
-          _animationController.reset();
-          _animationController.forward();
-        });
+        if (index != _bottomBarIndex) {
+          setState(() {
+            _bottomBarIndex = index;
+            _animationController.reset();
+            _animationController.forward();
+          });
+        }
       },
       items: [
         Icon(

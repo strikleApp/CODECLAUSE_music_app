@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:melody/constants/app_theme.dart';
+import 'package:melody/function/music_player_streams.dart';
 import 'package:melody/function/provider_function.dart';
 import 'package:melody/screens/loading_screen.dart';
 import 'package:melody/versionInfo/currentVersion.dart';
@@ -26,10 +27,7 @@ void main() async {
   );
 
   FirebaseMessaging.onBackgroundMessage(_messageHandler);
-  UnityAds.init(
-    gameId: '4379525',
-    testMode: true
-  );
+  UnityAds.init(gameId: '4379525', testMode: true);
   runApp(const MusicApp());
 }
 
@@ -42,6 +40,9 @@ class MusicApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<ProviderFunction>(
           create: (context) => ProviderFunction(),
+        ),
+        ChangeNotifierProvider<MusicPlayerStreams>(
+          create: (context) => MusicPlayerStreams(),
         ),
         StreamProvider<VersionInfo>.value(
           value: Database().streamVersionInfo(),

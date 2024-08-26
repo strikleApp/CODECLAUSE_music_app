@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:melody/db/hive.dart';
+import 'package:melody/function/audio_functions.dart';
+import 'package:melody/function/provider_function.dart';
 import 'package:melody/modals/songs_modal.dart';
+import 'package:provider/provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class ListWidget extends StatelessWidget {
@@ -12,10 +15,57 @@ class ListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Duration duration = videoDetails.duration ?? Duration.zero;
     return InkWell(
-      onTap: () {
-        HiveDB.saveSongModel(
-            songModal: SongsModal(
-                id: videoDetails.id.toString(), name: videoDetails.title));
+      onLongPress: () async {
+        await Provider.of<ProviderFunction>(context, listen: false)
+            .downloadAudio(
+                videoID: videoDetails.id.toString(),
+                title: videoDetails.title,
+                context: context);
+      },
+      onTap: () async {
+        bool isAdded = await HiveDB.saveAudioSongModel(
+          songModal: SongsModal(
+              id: videoDetails.id.toString(), name: videoDetails.title),
+        );
+        if (isAdded) {
+          if (context.mounted) {
+            await AudioFunctions().addAudio(
+                name: videoDetails.title,
+                id: videoDetails.id.toString(),
+                context: context);
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text("Added to playlist!"),
+                  action: SnackBarAction(
+                    textColor: Theme.of(context).primaryColor,
+                    label: "Play Now",
+                    onPressed: () {
+                      AudioFunctions()
+                          .jumpToVideoId(videoId: videoDetails.id.toString());
+                    },
+                  ),
+                ),
+              );
+            }
+          }
+        } else {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text("Already in playlist!"),
+                action: SnackBarAction(
+                  textColor: Theme.of(context).primaryColor,
+                  label: "Play Now",
+                  onPressed: () {
+                    AudioFunctions()
+                        .jumpToVideoId(videoId: videoDetails.id.toString());
+                  },
+                ),
+              ),
+            );
+          }
+        }
       },
       child: Column(
         children: [
