@@ -16,8 +16,7 @@ class YtFunctions {
       }
       return videoList;
     } catch (_) {
-      VideoSearchList videoSearchList =
-          await yt.search.search(keyword);
+      VideoSearchList videoSearchList = await yt.search.search(keyword);
       videoSearchList.removeWhere((v) => v.isLive);
       List<Video> videoList = [];
       for (Video v in videoSearchList) {
@@ -34,4 +33,9 @@ class YtFunctions {
     return audioOnlyStreamInfo.url;
   }
 
+  Future<Uri> getVideoUrl({required String id}) async {
+    StreamManifest manifest = await yt.videos.streamsClient.getManifest(id);
+    VideoStreamInfo videoOnlyStreamInfo = manifest.muxed.withHighestBitrate();
+    return videoOnlyStreamInfo.url;
+  }
 }

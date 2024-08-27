@@ -65,6 +65,10 @@ class LoadingScreenState extends State<LoadingScreen> {
             .getAllDownloads();
         if (mounted) {
           await AudioFunctions().getDownloadedAudio(context: context);
+          mounted
+              ? await Provider.of<ProviderFunction>(context, listen: false)
+                  .getAllVideos()
+              : null;
         }
       }
     } catch (e) {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:melody/constants/constants.dart';
 import 'package:melody/db/hive.dart';
 import 'package:melody/function/provider_function.dart';
 import 'package:melody/function/yt_functions.dart';
@@ -15,12 +16,13 @@ class AudioFunctions {
 
   Future<void> getDownloadedAudio({required BuildContext context}) async {
     try {
-      Directory audioPath = Directory(
-          "/storage/emulated/0/Android/data/com.strikle.melody.melody/files/data/user/0/com.strikle.melody.melody/files/audios/");
+      Directory audioPath = Directory(kAudioDownloadPath);
       List<FileSystemEntity> audios = audioPath.listSync();
       for (var audio in audios) {
-        final String id =
-            audio.path.replaceFirst(audio.parent.path, "").replaceAll("/", "");
+        final String id = audio.path
+            .replaceFirst(audio.parent.path, "")
+            .replaceAll("/", "")
+            .replaceAll(".mp3", "");
         final songs = HiveDB.audioBox.values.toList();
         SongsModal? songsModal;
         for (SongsModal item in songs) {
@@ -63,8 +65,13 @@ class AudioFunctions {
           return player.seek(Duration.zero, index: i);
         }
       }
-    } catch (_) {
-      print(_);
+    } catch (_) {}
+  }
+
+  Future<void> removeASong({required String songID}) async {
+    File file = File("$kAudioDownloadPath/$songID.mp3");
+    if (await file.exists()) {
+      await file.delete();
     }
   }
 }

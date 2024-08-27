@@ -18,6 +18,13 @@ class ListWidget extends StatelessWidget {
         context: context);
   }
 
+  Future<void> _downloadVideo({required BuildContext context}) async {
+    await Provider.of<ProviderFunction>(context, listen: false).downloadVideo(
+        videoID: videoDetails.id.toString(),
+        title: videoDetails.title,
+        context: context);
+  }
+
   Future<void> _streamAudio({required BuildContext context}) async {
     bool isAdded = await HiveDB.saveAudioSongModel(
       songModal:

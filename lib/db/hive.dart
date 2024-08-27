@@ -43,6 +43,21 @@ class HiveDB {
     return true;
   }
 
+  static Future<bool> saveVideoSongModel(
+      {required SongsModal songModal}) async {
+    for (var key in videoBox.keys) {
+      SongsModal songsModal = videoBox.get(key);
+      if (songsModal.id == songModal.id) {
+        /// return false means already present.
+        return false;
+      }
+    }
+    await videoBox.add(songModal);
+
+    /// return true means not present.
+    return true;
+  }
+
   static Future<void> changeASongModelName(
       {required String id, required String changedName}) async {
     for (var key in audioBox.keys) {

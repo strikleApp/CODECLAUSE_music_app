@@ -45,7 +45,6 @@ class MusicPlayerStreams with ChangeNotifier {
         notifyListeners();
       });
     } catch (e) {
-      print(e);
     }
   }
 }

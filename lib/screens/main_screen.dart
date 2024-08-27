@@ -45,7 +45,7 @@ class _MainScreenState extends State<MainScreen>
         children: [
           const SearchScreen().animate(controller: _animationController).fade(),
           const MusicScreen().animate(controller: _animationController).fade(),
-          const VideoScreen().animate(controller: _animationController).fade(),
+          VideoScreen().animate(controller: _animationController).fade(),
           const SettingsScreen()
               .animate(controller: _animationController)
               .fade(),

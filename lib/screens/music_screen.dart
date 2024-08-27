@@ -34,7 +34,6 @@ class _MusicScreenState extends State<MusicScreen> {
         _isLoading = false;
       });
     } catch (_) {
-      print(_);
     }
   }
 
@@ -180,7 +179,6 @@ class _MusicScreenState extends State<MusicScreen> {
 
 class MusicListWidget extends StatefulWidget {
   final int currentIndex;
-
   final int itemIndex;
 
   final IndexedAudioSource audioSource;
@@ -274,8 +272,7 @@ class _MusicListWidgetState extends State<MusicListWidget> {
                     'Play next',
                     'Download Video',
                     'Rename',
-                    'Remove from playlist',
-                    'Delete file from device',
+                    'Remove this song',
                     'Share'
                   }.map(
                     (String choice) {
@@ -311,11 +308,9 @@ class _MusicListWidgetState extends State<MusicListWidget> {
           _isEditingEnabled = true;
         });
         break;
-      case 'Remove from playlist':
+      case 'Remove this song':
         await Provider.of<ProviderFunction>(context, listen: false)
             .removeASong(id: videoId, index: index);
-        break;
-      case 'Delete file from device':
         break;
       case 'Download Video':
         break;
