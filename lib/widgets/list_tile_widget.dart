@@ -3,6 +3,7 @@ import 'package:melody/db/hive.dart';
 import 'package:melody/function/audio_functions.dart';
 import 'package:melody/function/provider_function.dart';
 import 'package:melody/modals/songs_modal.dart';
+import 'package:melody/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -71,11 +72,29 @@ class ListWidget extends StatelessWidget {
     }
   }
 
+  void switchOption(String option, BuildContext context) {
+    switch (option) {
+      case kStreamAudioOption:
+        _streamAudio(context: context);
+        break;
+      case kDownloadAudioOption:
+        _downloadAudio(context: context);
+        break;
+      case kDownloadVideoOption:
+        _downloadVideo(context: context);
+        break;
+      default:
+        null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Duration duration = videoDetails.duration ?? Duration.zero;
+    String selectedMode =
+        Provider.of<ProviderFunction>(context).selectedOnTapOption;
     return InkWell(
-      onTap: () => _streamAudio(context: context),
+      onTap: () => switchOption(selectedMode, context),
       child: Column(
         children: [
           AspectRatio(

@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:melody/constants/constants.dart';
+import 'package:melody/constants/shared_preferences_keys.dart';
 import 'package:melody/db/hive.dart';
 import 'package:melody/function/audio_functions.dart';
 import 'package:melody/function/video_function.dart';
@@ -11,6 +12,8 @@ import 'package:melody/function/yt_functions.dart';
 import 'package:melody/modals/DownloadClass.dart';
 import 'package:melody/modals/songs_modal.dart';
 import 'package:melody/modals/video_modal.dart';
+import 'package:melody/screens/loading_screen.dart';
+import 'package:melody/screens/settings_screen.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class ProviderFunction with ChangeNotifier {
@@ -19,6 +22,21 @@ class ProviderFunction with ChangeNotifier {
   List<Video>? video;
   List<DownloadClass> downloads = [];
   List<VideoFile> videos = [];
+  String selectedOnTapOption = kStreamAudioOption;
+
+  void getSelectedOption() {
+    selectedOnTapOption =
+        LoadingScreen.preferences.getString(spSavedOnTapOption) ??
+            kStreamAudioOption;
+    notifyListeners();
+  }
+
+  void setSelectedOption({required String option}) async {
+    selectedOnTapOption = option;
+    notifyListeners();
+
+    await LoadingScreen.preferences.setString(spSavedOnTapOption, option);
+  }
 
   Future<void> getVideosFromYoutube(String? keyword) async {
     video = await YtFunctions()

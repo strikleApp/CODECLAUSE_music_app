@@ -1,12 +1,14 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:melody/constants/constants.dart';
 import 'package:melody/db/hive.dart';
 import 'package:melody/function/audio_functions.dart';
 import 'package:melody/function/provider_function.dart';
 import 'package:melody/screens/main_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoadingScreen extends StatefulWidget {
@@ -57,6 +59,10 @@ class LoadingScreenState extends State<LoadingScreen> {
       LoadingScreen.preferences = await SharedPreferences.getInstance();
       await HiveDB.initHive();
       if (mounted) {
+        Provider.of<ProviderFunction>(context, listen: false)
+            .getSelectedOption();
+      }
+      if (mounted) {
         await Provider.of<ProviderFunction>(context, listen: false)
             .getVideosFromYoutube(kInitialSearchKeyword);
       }
@@ -91,19 +97,17 @@ class LoadingScreenState extends State<LoadingScreen> {
           return Scaffold(
             backgroundColor: Theme.of(context).primaryColor,
             body: Center(
-              child: SizedBox(
-                width: 250.0,
-                child: DefaultTextStyle(
-                  style: const TextStyle(
-                    fontSize: 80,
-                    fontFamily: 'Damion',
-                  ),
-                  child: AnimatedTextKit(
-                    repeatForever: true,
-                    animatedTexts: [
-                      FlickerAnimatedText('Melody'),
-                    ],
-                  ),
+              child: DefaultTextStyle(
+                style:  TextStyle(
+                  fontSize: 38.sp,
+                  fontFamily: "Damion",
+                ),
+                child: AnimatedTextKit(
+
+                  repeatForever: true,
+                  animatedTexts: [
+                    FlickerAnimatedText('Melody'),
+                  ],
                 ),
               ),
             ),

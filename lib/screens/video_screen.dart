@@ -14,12 +14,16 @@ class VideoScreen extends StatelessWidget {
     List<VideoFile> videoFiles = Provider.of<ProviderFunction>(context).videos;
     return Scaffold(
       body: SafeArea(
-        child: ListView.builder(
-          itemCount: videoFiles.length,
-          itemBuilder: (context, index) {
-            return VideoFileItem(videoFiles[index]);
-          },
-        ),
+        child: videoFiles.isEmpty
+            ? const Center(
+                child: Text("Download any video."),
+              )
+            : ListView.builder(
+                itemCount: videoFiles.length,
+                itemBuilder: (context, index) {
+                  return VideoFileItem(videoFiles[index]);
+                },
+              ),
       ),
     );
   }

@@ -1,11 +1,15 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:melody/constants/constants.dart';
+import 'package:melody/function/audio_functions.dart';
+import 'package:melody/function/provider_function.dart';
 import 'package:melody/screens/download_screen.dart';
 import 'package:melody/screens/music_screen.dart';
 import 'package:melody/screens/search_screen.dart';
 import 'package:melody/screens/settings_screen.dart';
 import 'package:melody/screens/video_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class MainScreen extends StatefulWidget {
@@ -27,6 +31,12 @@ class _MainScreenState extends State<MainScreen>
   }
 
   @override
+  void dispose() {
+    AudioFunctions.player.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: _buildCurvedNavigationBar(context),
@@ -45,7 +55,7 @@ class _MainScreenState extends State<MainScreen>
         children: [
           const SearchScreen().animate(controller: _animationController).fade(),
           const MusicScreen().animate(controller: _animationController).fade(),
-          VideoScreen().animate(controller: _animationController).fade(),
+          const VideoScreen().animate(controller: _animationController).fade(),
           const SettingsScreen()
               .animate(controller: _animationController)
               .fade(),
@@ -61,13 +71,16 @@ class _MainScreenState extends State<MainScreen>
       color: Theme.of(context).colorScheme.primary,
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       buttonBackgroundColor: Theme.of(context).colorScheme.primary,
-      onTap: (index) {
+      onTap: (index) async {
         if (index != _bottomBarIndex) {
           setState(() {
             _bottomBarIndex = index;
             _animationController.reset();
             _animationController.forward();
           });
+        } else if (_bottomBarIndex == 0 && index == 0) {
+          await Provider.of<ProviderFunction>(context, listen: false)
+              .getVideosFromYoutube(kInitialSearchKeyword);
         }
       },
       items: [
