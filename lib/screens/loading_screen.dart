@@ -1,7 +1,6 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:melody/constants/constants.dart';
 import 'package:melody/db/hive.dart';
 import 'package:melody/function/audio_functions.dart';
@@ -50,7 +49,6 @@ class LoadingScreenState extends State<LoadingScreen> {
       },
     );
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      print('Message clicked!');
     });
   }
 

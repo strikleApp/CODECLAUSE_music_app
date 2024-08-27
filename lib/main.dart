@@ -14,7 +14,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 Future<void> _messageHandler(RemoteMessage message) async {
-  print('background message ${message.notification!.body}');
+  //print('background message ${message.notification!.body}');
 }
 
 void main() async {

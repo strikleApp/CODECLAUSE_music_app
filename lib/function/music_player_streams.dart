@@ -44,7 +44,7 @@ class MusicPlayerStreams with ChangeNotifier {
         processingState = event;
         notifyListeners();
       });
-    } catch (e) {
+    } catch (_) {
     }
   }
 }

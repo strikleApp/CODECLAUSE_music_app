@@ -9,6 +9,7 @@ import 'package:melody/widgets/playPauseButton.dart';
 import 'package:melody/widgets/roundedButton.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class MusicScreen extends StatefulWidget {
@@ -33,8 +34,7 @@ class _MusicScreenState extends State<MusicScreen> {
       setState(() {
         _isLoading = false;
       });
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 
   @override
@@ -265,7 +265,8 @@ class _MusicListWidgetState extends State<MusicListWidget> {
                       videoId: widget.audioSource.tag.id,
                       context: context,
                       currentPlaying: widget.currentIndex,
-                      index: widget.itemIndex);
+                      index: widget.itemIndex,
+                      videoTitle: widget.audioSource.tag.title);
                 },
                 itemBuilder: (context) {
                   return {
@@ -288,13 +289,13 @@ class _MusicListWidgetState extends State<MusicListWidget> {
     );
   }
 
-  void _handleClick({
-    required String value,
-    required String videoId,
-    required BuildContext context,
-    required int currentPlaying,
-    required int index,
-  }) async {
+  void _handleClick(
+      {required String value,
+      required String videoId,
+      required BuildContext context,
+      required int currentPlaying,
+      required int index,
+      required String videoTitle}) async {
     switch (value) {
       case 'Play next':
         await Provider.of<ProviderFunction>(context, listen: false)
@@ -313,8 +314,12 @@ class _MusicListWidgetState extends State<MusicListWidget> {
             .removeASong(id: videoId, index: index);
         break;
       case 'Download Video':
+        await Provider.of<ProviderFunction>(context, listen: false)
+            .downloadVideo(
+                videoID: videoId, title: videoTitle, context: context);
         break;
       case 'Share':
+        Share.share("Hey! Check out this song that I just heard from Melody app!"" https://www.youtube.com/watch?v=$videoId");
         break;
       default:
         break;

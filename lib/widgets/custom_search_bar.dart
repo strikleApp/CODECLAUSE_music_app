@@ -168,9 +168,9 @@ class _AnimSearchBarState extends State<AnimSearchBar>
                               toggle = 0;
                             });
                           }
-                        } catch (e) {
+                        } catch (_) {
                           ///print the error if the try block fails
-                          print(e);
+                          //print(e);
                         }
                       },
 

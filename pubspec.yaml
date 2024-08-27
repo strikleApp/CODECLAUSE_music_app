@@ -45,6 +45,7 @@ dependencies:
   hive_flutter: ^1.1.0
   skeletonizer: ^1.4.2
   flutter_file_downloader: ^2.0.0
+  share_plus: ^10.0.0
 
 dev_dependencies:
   flutter_test:

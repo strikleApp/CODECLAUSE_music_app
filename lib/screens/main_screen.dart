@@ -32,6 +32,7 @@ class _MainScreenState extends State<MainScreen>
 
   @override
   void dispose() {
+    AudioFunctions.player.stop();
     AudioFunctions.player.dispose();
     super.dispose();
   }
