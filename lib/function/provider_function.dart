@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:hive/hive.dart';
@@ -10,7 +9,6 @@ import 'package:melody/function/audio_functions.dart';
 import 'package:melody/function/yt_functions.dart';
 import 'package:melody/modals/DownloadClass.dart';
 import 'package:melody/modals/songs_modal.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class ProviderFunction with ChangeNotifier {
@@ -31,23 +29,27 @@ class ProviderFunction with ChangeNotifier {
   }
 
   Future<void> loadAllAudioPlaylist({required BuildContext context}) async {
-    List<SongsModal> songModals = HiveDB.getAudioSongModals();
-    audioPlaylist.clear();
-    for (var songModal in songModals) {
-      Uri uri = await YtFunctions().getAudioUrl(id: songModal.id);
-      audioPlaylist.add(
-        AudioSource.uri(
-          uri,
-          tag: MediaItem(id: songModal.id, title: songModal.name),
-        ),
+    try {
+      List<SongsModal> songModals = HiveDB.getAudioSongModals();
+      audioPlaylist.clear();
+      for (var songModal in songModals) {
+        Uri uri = await YtFunctions().getAudioUrl(id: songModal.id);
+        audioPlaylist.add(
+          AudioSource.uri(
+            uri,
+            tag: MediaItem(id: songModal.id, title: songModal.name),
+          ),
+        );
+      }
+      playlist = ConcatenatingAudioSource(
+        useLazyPreparation: true,
+        children: audioPlaylist,
       );
+      await AudioFunctions.player.setAudioSource(playlist!);
+      notifyListeners();
+    } catch (_) {
+      print(_);
     }
-    playlist = ConcatenatingAudioSource(
-      useLazyPreparation: true,
-      children: audioPlaylist,
-    );
-    await AudioFunctions.player.setAudioSource(playlist!);
-    notifyListeners();
   }
 
   Future<void> removeASong({required String id, required int index}) async {
@@ -101,16 +103,14 @@ class ProviderFunction with ChangeNotifier {
           );
         }
       }
-
-      Directory dir = await getApplicationDocumentsDirectory();
-      String path = dir.path;
       Uri uri = await YtFunctions().getAudioUrl(id: videoID);
       int? downloadID;
       int? savedDownloadKey;
       await FileDownloader.downloadFile(
+          downloadDestination: DownloadDestinations.appFiles,
+          subPath: "/audios/",
           url: uri.toString(),
           name: "$videoID.mp3",
-          subPath: "$path/audios",
           onDownloadRequestIdReceived: (int id) async {
             downloadID = id;
             DownloadClass download = DownloadClass(
@@ -130,6 +130,8 @@ class ProviderFunction with ChangeNotifier {
             downloads[index].progress = 100;
             HiveDB.completeDownload(savedDownloadKey!);
             notifyListeners();
+            HiveDB.saveAudioSongModel(
+                songModal: SongsModal(id: videoID, name: title));
             //   download.progress = 100;
           },
           onDownloadError: (String error) {

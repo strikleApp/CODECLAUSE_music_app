@@ -11,62 +11,64 @@ class ListWidget extends StatelessWidget {
 
   const ListWidget({super.key, required this.videoDetails});
 
+  Future<void> _downloadAudio({required BuildContext context}) async {
+    await Provider.of<ProviderFunction>(context, listen: false).downloadAudio(
+        videoID: videoDetails.id.toString(),
+        title: videoDetails.title,
+        context: context);
+  }
+
+  Future<void> _streamAudio({required BuildContext context}) async {
+    bool isAdded = await HiveDB.saveAudioSongModel(
+      songModal:
+          SongsModal(id: videoDetails.id.toString(), name: videoDetails.title),
+    );
+    if (isAdded) {
+      if (context.mounted) {
+        await AudioFunctions().addAudio(
+            name: videoDetails.title,
+            id: videoDetails.id.toString(),
+            context: context);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text("Added to playlist!"),
+              action: SnackBarAction(
+                textColor: Theme.of(context).primaryColor,
+                label: "Play Now",
+                onPressed: () {
+                  AudioFunctions()
+                      .jumpToVideoId(videoId: videoDetails.id.toString());
+                },
+              ),
+            ),
+          );
+        }
+      }
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text("Already in playlist!"),
+            action: SnackBarAction(
+              textColor: Theme.of(context).primaryColor,
+              label: "Play Now",
+              onPressed: () {
+                AudioFunctions()
+                    .jumpToVideoId(videoId: videoDetails.id.toString());
+              },
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Duration duration = videoDetails.duration ?? Duration.zero;
     return InkWell(
-      onLongPress: () async {
-        await Provider.of<ProviderFunction>(context, listen: false)
-            .downloadAudio(
-                videoID: videoDetails.id.toString(),
-                title: videoDetails.title,
-                context: context);
-      },
-      onTap: () async {
-        bool isAdded = await HiveDB.saveAudioSongModel(
-          songModal: SongsModal(
-              id: videoDetails.id.toString(), name: videoDetails.title),
-        );
-        if (isAdded) {
-          if (context.mounted) {
-            await AudioFunctions().addAudio(
-                name: videoDetails.title,
-                id: videoDetails.id.toString(),
-                context: context);
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text("Added to playlist!"),
-                  action: SnackBarAction(
-                    textColor: Theme.of(context).primaryColor,
-                    label: "Play Now",
-                    onPressed: () {
-                      AudioFunctions()
-                          .jumpToVideoId(videoId: videoDetails.id.toString());
-                    },
-                  ),
-                ),
-              );
-            }
-          }
-        } else {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text("Already in playlist!"),
-                action: SnackBarAction(
-                  textColor: Theme.of(context).primaryColor,
-                  label: "Play Now",
-                  onPressed: () {
-                    AudioFunctions()
-                        .jumpToVideoId(videoId: videoDetails.id.toString());
-                  },
-                ),
-              ),
-            );
-          }
-        }
-      },
+      onTap: () => _streamAudio(context: context),
       child: Column(
         children: [
           AspectRatio(

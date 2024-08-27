@@ -12,35 +12,40 @@ class MusicPlayerStreams with ChangeNotifier {
   ProcessingState? processingState;
 
   void audioListStream() {
-    AudioFunctions.player.sequenceStream
-        .listen((List<IndexedAudioSource>? audioSource) {
-      audioSources = audioSource;
-      notifyListeners();
-    });
-    AudioFunctions.player.currentIndexStream.listen((int? index) {
-      currentIndex = index ?? 0;
-      notifyListeners();
-    });
-    AudioFunctions.player.playbackEventStream
-        .listen((PlaybackEvent playbackEvent) {
-      totalDuration = playbackEvent.duration ?? Duration.zero;
-      notifyListeners();
-    });
-    AudioFunctions.player.playingStream.listen((bool event) {
-      isPlaying = event;
-      notifyListeners();
-    });
-    AudioFunctions.player.positionStream.listen((Duration event) {
-      currentDuration = event;
-      notifyListeners();
-    });
-    AudioFunctions.player.shuffleModeEnabledStream.listen((bool event) {
-      isShuffleOn = event;
-      notifyListeners();
-    });
-    AudioFunctions.player.processingStateStream.listen((ProcessingState event) {
-      processingState = event;
-      notifyListeners();
-    });
+    try {
+      AudioFunctions.player.sequenceStream
+          .listen((List<IndexedAudioSource>? audioSource) {
+        audioSources = audioSource;
+        notifyListeners();
+      });
+      AudioFunctions.player.currentIndexStream.listen((int? index) {
+        currentIndex = index ?? 0;
+        notifyListeners();
+      });
+      AudioFunctions.player.playbackEventStream
+          .listen((PlaybackEvent playbackEvent) {
+        totalDuration = playbackEvent.duration ?? Duration.zero;
+        notifyListeners();
+      });
+      AudioFunctions.player.playingStream.listen((bool event) {
+        isPlaying = event;
+        notifyListeners();
+      });
+      AudioFunctions.player.positionStream.listen((Duration event) {
+        currentDuration = event;
+        notifyListeners();
+      });
+      AudioFunctions.player.shuffleModeEnabledStream.listen((bool event) {
+        isShuffleOn = event;
+        notifyListeners();
+      });
+      AudioFunctions.player.processingStateStream
+          .listen((ProcessingState event) {
+        processingState = event;
+        notifyListeners();
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 }

@@ -23,14 +23,19 @@ class _MusicScreenState extends State<MusicScreen> {
   bool _isLoading = true;
 
   Future<void> getInitial() async {
-    await Provider.of<ProviderFunction>(context, listen: false)
-        .loadAllAudioPlaylist(context: context);
-    if (mounted) {
-      Provider.of<MusicPlayerStreams>(context, listen: false).audioListStream();
+    try {
+      await Provider.of<ProviderFunction>(context, listen: false)
+          .loadAllAudioPlaylist(context: context);
+      if (mounted) {
+        Provider.of<MusicPlayerStreams>(context, listen: false)
+            .audioListStream();
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (_) {
+      print(_);
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override

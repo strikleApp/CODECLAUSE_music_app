@@ -2,14 +2,11 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:melody/constants/constants.dart';
-import 'package:melody/constants/shared_preferences_keys.dart';
 import 'package:melody/db/hive.dart';
-import 'package:melody/function/music_player_streams.dart';
+import 'package:melody/function/audio_functions.dart';
 import 'package:melody/function/provider_function.dart';
 import 'package:melody/screens/main_screen.dart';
-import 'package:melody/screens/ttsScreen.dart';
 import 'package:provider/provider.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoadingScreen extends StatefulWidget {
@@ -22,10 +19,8 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class LoadingScreenState extends State<LoadingScreen> {
-  late bool storagePermission = true;
   late Future getFuture;
   late FirebaseMessaging messaging;
-  late bool isFirstTime = true;
 
   Future<void> firebaseFunction() async {
     messaging = FirebaseMessaging.instance;
@@ -60,7 +55,6 @@ class LoadingScreenState extends State<LoadingScreen> {
   Future<void> initial() async {
     try {
       LoadingScreen.preferences = await SharedPreferences.getInstance();
-      isFirstTime = LoadingScreen.preferences.getBool(spFirstTime) ?? true;
       await HiveDB.initHive();
       if (mounted) {
         await Provider.of<ProviderFunction>(context, listen: false)
@@ -69,9 +63,12 @@ class LoadingScreenState extends State<LoadingScreen> {
       if (mounted) {
         await Provider.of<ProviderFunction>(context, listen: false)
             .getAllDownloads();
+        if (mounted) {
+          await AudioFunctions().getDownloadedAudio(context: context);
+        }
       }
-    } catch (_) {
-      print(_);
+    } catch (e) {
+      Future.error(e);
     }
   }
 
@@ -108,142 +105,7 @@ class LoadingScreenState extends State<LoadingScreen> {
             ),
           );
         }
-        if (!storagePermission) {
-          return Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.onSecondary,
-            body: Center(
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  borderRadius: BorderRadius.circular(16.0), // Rounded border
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10.0,
-                      offset: const Offset(0, 5), // Shadow for some depth
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.storage_rounded,
-                      color: Theme.of(context).primaryColor,
-                      size: 100,
-                    ),
-                    const SizedBox(height: 16.0),
-                    Text(
-                      'Please grant storage permission.',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: 16.0),
-                    TextButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(16.0)),
-                          ),
-                          builder: (context) {
-                            return Container(
-                              height: MediaQuery.of(context).size.height / 2.5,
-                              padding: const EdgeInsets.all(16.0),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(16.0)),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '1. Open your phone\'s settings.\n'
-                                  '2. Open apps.\n'
-                                  '3. Find this app from the list.\n'
-                                  '4. Go to permissions.\n'
-                                  '5. Grant storage permission.',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(color: Colors.white),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                      child: Text(
-                        'How can I do it?',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    TextButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(16.0)),
-                          ),
-                          builder: (context) {
-                            return Container(
-                              height: MediaQuery.of(context).size.height / 2.5,
-                              padding: const EdgeInsets.all(16.0),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(16.0)),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Storage permission is used here to download content and play them in respective players.',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(color: Colors.white),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                      child: Text(
-                        'Why permission is needed?',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        Restart.restartApp();
-                      },
-                      child: const Text(
-                        'I gave permission.',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }
-        if (isFirstTime && storagePermission) {
-          return const TTSScreen();
-        }
-        if (storagePermission && !snapshot.hasError && !isFirstTime) {
+        if (!snapshot.hasError) {
           return const MainScreen();
         }
         return Scaffold(
