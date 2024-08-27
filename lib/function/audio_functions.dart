@@ -62,6 +62,7 @@ class AudioFunctions {
     try {
       for (int i = 0; i < player.sequence!.length; i++) {
         if (player.sequence![i].tag.id == videoId) {
+          AudioFunctions.player.play();
           return player.seek(Duration.zero, index: i);
         }
       }

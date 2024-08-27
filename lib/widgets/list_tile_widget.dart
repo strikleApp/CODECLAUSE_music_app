@@ -5,6 +5,7 @@ import 'package:melody/function/provider_function.dart';
 import 'package:melody/modals/songs_modal.dart';
 import 'package:melody/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class ListWidget extends StatelessWidget {
@@ -111,7 +112,10 @@ class ListWidget extends StatelessWidget {
                 '${videoDetails.author} ･ ${_formatDuration(duration)} ･ ${_formatViewCount(videoDetails.engagement.viewCount)}'),
             trailing: PopupMenuButton(
               onSelected: (String value) {
-                handleClick(value: value, context: context);
+                handleClick(
+                    value: value,
+                    context: context,
+                    videoId: videoDetails.id.toString());
               },
               icon: const Icon(Icons.more_vert),
               itemBuilder: (BuildContext context) {
@@ -134,13 +138,21 @@ class ListWidget extends StatelessWidget {
   }
 
   void handleClick(
-      {required String value, required BuildContext context}) async {
+      {required String value,
+      required BuildContext context,
+      required String videoId}) async {
     switch (value) {
       case 'Download Video':
+        _downloadVideo(context: context);
         break;
       case 'Download Audio':
+        _downloadAudio(context: context);
         break;
       case 'Share':
+        Share.share(
+            "Hey! Check out this song that I just heard from Melody app!"
+            " https://www.youtube.com/watch?v=$videoId");
+
         break;
     }
   }

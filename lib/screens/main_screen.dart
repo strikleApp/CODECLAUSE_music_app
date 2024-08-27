@@ -20,21 +20,33 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   int _bottomBarIndex = 0;
   late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _animationController = AnimationController(vsync: this);
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      if (AppLifecycleState.detached == state) {
+        AudioFunctions.player.stop();
+        AudioFunctions.player.dispose();
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    super.dispose();
+    _animationController.dispose();
     AudioFunctions.player.stop();
     AudioFunctions.player.dispose();
-    super.dispose();
   }
 
   @override
