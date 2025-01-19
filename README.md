@@ -30,7 +30,7 @@ Melody is a powerful and user-friendly app that lets you search for videos on Yo
 - Active internet connection for streaming and downloading.
 
 ### Installation
-1. **Download the APK:** Get the latest version of the Melody app from [your download link].
+1. **Download the APK:** Get the latest version of the Melody app from http://bit.ly/3X4MAFv.
 2. **Install the APK:** Follow the on-screen instructions to install the app on your device.
 3. **Open Melody:** Start the app and explore its features.
 
